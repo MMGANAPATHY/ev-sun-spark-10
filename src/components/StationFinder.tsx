@@ -3,11 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Navigation, MapPin, Zap, Clock, Battery, Route } from "lucide-react";
+import { Navigation, MapPin, Zap, Clock, Battery, Route, Sun, Thermometer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import InteractiveMap from "./InteractiveMap";
 
-// Dummy charging station locations
+// Generate mock IoT data for each station
+const generateStationData = () => ({
+  solarPower: Math.random() * 5000 + 2000, // 2-7kW
+  batteryLevel: Math.random() * 40 + 60, // 60-100%
+  temperature: Math.random() * 10 + 25, // 25-35°C
+  voltage: Math.random() * 20 + 220, // 220-240V
+  current: Math.random() * 50 + 10, // 10-60A
+});
+
+// Dummy charging station locations with IoT data
 const dummyStations = [
   {
     id: 1,
@@ -21,7 +30,8 @@ const dummyStations = [
     fastCharging: true,
     solarPowered: true,
     pricePerKwh: 0.15,
-    operatingHours: "24/7"
+    operatingHours: "24/7",
+    iotData: generateStationData()
   },
   {
     id: 2,
@@ -35,7 +45,8 @@ const dummyStations = [
     fastCharging: true,
     solarPowered: true,
     pricePerKwh: 0.12,
-    operatingHours: "6:00 AM - 10:00 PM"
+    operatingHours: "6:00 AM - 10:00 PM",
+    iotData: generateStationData()
   },
   {
     id: 3,
@@ -49,7 +60,8 @@ const dummyStations = [
     fastCharging: false,
     solarPowered: false,
     pricePerKwh: 0.18,
-    operatingHours: "24/7"
+    operatingHours: "24/7",
+    iotData: generateStationData()
   },
   {
     id: 4,
@@ -63,7 +75,8 @@ const dummyStations = [
     fastCharging: true,
     solarPowered: true,
     pricePerKwh: 0.14,
-    operatingHours: "24/7"
+    operatingHours: "24/7",
+    iotData: generateStationData()
   },
   {
     id: 5,
@@ -77,7 +90,8 @@ const dummyStations = [
     fastCharging: true,
     solarPowered: true,
     pricePerKwh: 0.16,
-    operatingHours: "5:00 AM - 11:00 PM"
+    operatingHours: "5:00 AM - 11:00 PM",
+    iotData: generateStationData()
   }
 ];
 
@@ -256,30 +270,57 @@ export const StationFinder = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  {/* Station Metrics Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                     <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        {station.availableChargers}/{station.totalChargers} Available
+                      <Sun className="h-4 w-4 text-solar-orange" />
+                      <span className="text-sm font-medium">
+                        {(station.iotData.solarPower / 1000).toFixed(1)} kW
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <Battery className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">${station.pricePerKwh}/kWh</span>
+                      <Battery className="h-4 w-4 text-accent" />
+                      <span className="text-sm font-medium">
+                        {Math.round(station.iotData.batteryLevel)}%
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Thermometer className="h-4 w-4 text-secondary" />
+                      <span className="text-sm font-medium">
+                        {station.iotData.temperature.toFixed(1)}°C
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">
+                        {station.iotData.voltage.toFixed(0)}V
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        {station.iotData.current.toFixed(1)}A
+                      </span>
                     </div>
                     
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
-                        ~{Math.round(station.distance * 2)} min drive
+                        ~{Math.round(station.distance * 2)} min
                       </span>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Route className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Navigate</span>
-                    </div>
+                  </div>
+
+                  {/* Availability Info */}
+                  <div className="flex items-center justify-between mb-4 p-2 bg-muted/30 rounded-lg">
+                    <span className="text-sm">
+                      {station.availableChargers}/{station.totalChargers} Chargers Available
+                    </span>
+                    <span className="text-sm font-medium">${station.pricePerKwh}/kWh</span>
                   </div>
 
                   <div className="flex gap-2">
