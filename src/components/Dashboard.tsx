@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { StationCard } from "./StationCard";
 import { MetricsCard } from "./MetricsCard";
 import { EnvironmentCard } from "./EnvironmentCard";
-import { ChargingChart } from "./ChargingChart";
+
 import { Zap, Sun, Battery, Thermometer, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -172,8 +172,6 @@ export const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Charging Chart */}
-        <ChargingChart />
 
         {/* Charging Stations Grid */}
         <div>
