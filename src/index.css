@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Dark energy theme */
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Electric blue primary */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 4%;
+
+    /* Solar orange secondary */
+    --secondary: 25 95% 53%;
+    --secondary-foreground: 222 47% 4%;
+
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Green accent for renewable energy */
+    --accent: 142 71% 45%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    /* Custom solar energy colors */
+    --solar-yellow: 48 100% 67%;
+    --solar-orange: 25 95% 53%;
+    --electric-blue: 217 91% 60%;
+    --eco-green: 142 71% 45%;
+    --energy-purple: 262 83% 58%;
+
+    /* Gradients */
+    --gradient-solar: linear-gradient(135deg, hsl(var(--solar-yellow)), hsl(var(--solar-orange)));
+    --gradient-electric: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--energy-purple)));
+    --gradient-eco: linear-gradient(135deg, hsl(var(--eco-green)), hsl(var(--electric-blue)));
+
+    /* Shadows and effects */
+    --glow-electric: 0 0 20px hsl(var(--electric-blue) / 0.3);
+    --glow-solar: 0 0 20px hsl(var(--solar-orange) / 0.3);
+    --glow-eco: 0 0 20px hsl(var(--eco-green) / 0.3);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Same as root for consistent dark theme */
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 4%;
+
+    --secondary: 25 95% 53%;
+    --secondary-foreground: 222 47% 4%;
+
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 142 71% 45%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 217 91% 60%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
