@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Navigation, MapPin, Zap, Clock, Battery, Route } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import InteractiveMap from "./InteractiveMap";
 
 // Dummy charging station locations
 const dummyStations = [
@@ -203,25 +204,16 @@ export const StationFinder = () => {
           </CardContent>
         </Card>
 
-        {/* Map Placeholder */}
-        <Card className="bg-gradient-to-br from-card to-accent/5 border-accent/20">
-          <CardContent className="p-6">
-            <div className="h-64 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20"></div>
-              <div className="text-center z-10">
-                <MapPin className="h-12 w-12 mx-auto mb-4 text-accent" />
-                <p className="text-muted-foreground mb-2">Interactive Map Coming Soon</p>
-                <p className="text-sm text-muted-foreground">
-                  🗺️ Mapbox integration ready for deployment
-                </p>
-              </div>
-              {/* Dummy map pins */}
-              <div className="absolute top-4 left-8 w-4 h-4 bg-accent rounded-full animate-pulse"></div>
-              <div className="absolute bottom-8 right-12 w-4 h-4 bg-primary rounded-full animate-pulse"></div>
-              <div className="absolute top-12 right-6 w-4 h-4 bg-secondary rounded-full animate-pulse"></div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Interactive Map */}
+        <InteractiveMap 
+          stations={sortedStations} 
+          onStationClick={(station) => {
+            toast({
+              title: "Station Selected",
+              description: `Selected ${station.name} - ${station.availableChargers}/${station.totalChargers} chargers available`,
+            });
+          }}
+        />
 
         {/* Station List */}
         <div className="space-y-4">
