@@ -33,7 +33,7 @@ export const EnvironmentCard = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-accent">
           <Thermometer className="h-5 w-5" />
-          Environment (DHT22)
+          Environment
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -59,17 +59,14 @@ export const EnvironmentCard = ({
             <div>
               <p className="text-sm text-muted-foreground">Humidity</p>
               <p className={cn("text-2xl font-bold", getHumidityColor(humidity))}>
-                {humidity.toFixed(1)}%
+                {humidity.toFixed(2)}%
               </p>
             </div>
           </div>
         </div>
 
         <div className="pt-4 border-t border-border/50">
-          <p className="text-xs text-muted-foreground">
-            📡 ESP32 + DHT22 Sensor Module
-          </p>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2">
             <div className="h-2 w-2 bg-accent rounded-full animate-pulse"></div>
             <span className="text-xs text-accent">Live Data</span>
           </div>
