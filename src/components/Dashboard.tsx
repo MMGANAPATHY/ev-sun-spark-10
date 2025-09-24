@@ -23,9 +23,9 @@ const generateMockData = () => ({
 });
 
 const mockStations = [
-  { id: 1, name: "Station Alpha", status: "charging" as const, progress: 75, timeRemaining: "45 min" },
+  { id: 1, name: "Station Alpha", status: "charging" as const, progress: 75.34, timeRemaining: "45 min" },
   { id: 2, name: "Station Beta", status: "available" as const, progress: 0, timeRemaining: "0 min" },
-  { id: 3, name: "Station Gamma", status: "charging" as const, progress: 32, timeRemaining: "2h 15min" },
+  { id: 3, name: "Station Gamma", status: "charging" as const, progress: 32.78, timeRemaining: "2h 15min" },
   { id: 4, name: "Station Delta", status: "maintenance" as const, progress: 0, timeRemaining: "N/A" },
 ];
 

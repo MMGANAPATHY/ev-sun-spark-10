@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Card } from "@/components/ui/card";
 
 interface Station {
@@ -11,11 +9,13 @@ interface Station {
   address: string;
   lat: number;
   lng: number;
+  distance: number;
   availableChargers: number;
   totalChargers: number;
   fastCharging: boolean;
   solarPowered: boolean;
   pricePerKwh: number;
+  iotData: any;
 }
 
 interface InteractiveMapProps {
@@ -25,120 +25,100 @@ interface InteractiveMapProps {
 
 const InteractiveMap: React.FC<InteractiveMapProps> = ({ stations, onStationClick }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [showTokenInput, setShowTokenInput] = useState(true);
+  const map = useRef<L.Map | null>(null);
 
-  const initializeMap = (token: string) => {
-    if (!mapContainer.current || !token) return;
+  useEffect(() => {
+    if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = token;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [-74.0060, 40.7128], // NYC default
-      zoom: 12
-    });
+    // Initialize Leaflet map with OpenStreetMap tiles (free)
+    map.current = L.map(mapContainer.current).setView([40.7128, -74.006], 12);
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    // Add OpenStreetMap tile layer (free alternative to Mapbox)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map.current);
 
     // Add markers for each station
     stations.forEach((station) => {
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.width = '20px';
-      el.style.height = '20px';
-      el.style.borderRadius = '50%';
-      el.style.cursor = 'pointer';
-      el.style.border = '2px solid white';
-      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+      if (!map.current) return;
       
-      // Color based on availability
-      if (station.availableChargers === 0) {
-        el.style.backgroundColor = '#ef4444'; // red
-      } else if (station.availableChargers <= station.totalChargers * 0.25) {
-        el.style.backgroundColor = '#f59e0b'; // yellow
-      } else {
-        el.style.backgroundColor = '#10b981'; // green
-      }
+      const availability = station.availableChargers / station.totalChargers;
+      const markerColor = availability > 0.6 ? '#22c55e' : availability > 0.3 ? '#f59e0b' : '#ef4444';
 
-      // Create popup
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div class="p-2">
-          <h3 class="font-bold">${station.name}</h3>
-          <p class="text-sm text-gray-600">${station.address}</p>
-          <p class="text-sm">
-            ${station.availableChargers}/${station.totalChargers} chargers available
-          </p>
-          <p class="text-sm">$${station.pricePerKwh}/kWh</p>
-          ${station.solarPowered ? '<span class="text-xs bg-yellow-100 px-1 rounded">☀️ Solar</span>' : ''}
-          ${station.fastCharging ? '<span class="text-xs bg-blue-100 px-1 rounded">⚡ Fast</span>' : ''}
-        </div>
-      `);
+      // Create custom icon
+      const customIcon = L.divIcon({
+        html: `
+          <div style="
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: ${markerColor};
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+          ">⚡</div>
+        `,
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
 
       // Create marker
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([station.lng, station.lat])
-        .setPopup(popup)
-        .addTo(map.current!);
+      const marker = L.marker([station.lat, station.lng], { icon: customIcon })
+        .addTo(map.current);
 
-      // Add click event
-      el.addEventListener('click', () => {
-        if (onStationClick) {
-          onStationClick(station);
-        }
-      });
-    });
-  };
-
-  const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setShowTokenInput(false);
-      initializeMap(mapboxToken);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      map.current?.remove();
-    };
-  }, []);
-
-  if (showTokenInput) {
-    return (
-      <Card className="bg-gradient-to-br from-card to-accent/5 border-accent/20">
-        <div className="p-6">
-          <div className="h-64 flex items-center justify-center">
-            <div className="text-center space-y-4 max-w-md">
-              <h3 className="text-lg font-semibold">Setup Interactive Map</h3>
-              <p className="text-sm text-muted-foreground">
-                Enter your Mapbox public token to enable the interactive map.
-                Get yours at <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">mapbox.com</a>
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="pk.ey..."
-                  value={mapboxToken}
-                  onChange={(e) => setMapboxToken(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={handleTokenSubmit}>
-                  Load Map
-                </Button>
-              </div>
-            </div>
+      // Create popup content
+      const popupContent = `
+        <div style="padding: 10px; min-width: 200px;">
+          <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${station.name}</h3>
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280;">${station.address}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px; color: #374151;">Chargers:</span>
+            <span style="font-weight: bold; color: ${markerColor};">${station.availableChargers}/${station.totalChargers}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px; color: #374151;">Price:</span>
+            <span style="font-weight: bold;">$${station.pricePerKwh}/kWh</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14px; color: #374151;">Distance:</span>
+            <span style="font-weight: bold;">${station.distance} miles</span>
+          </div>
+          <div style="margin-top: 8px;">
+            ${station.solarPowered ? '<span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 12px;">☀️ Solar</span>' : ''}
+            ${station.fastCharging ? '<span style="background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 4px;">⚡ Fast</span>' : ''}
           </div>
         </div>
-      </Card>
-    );
-  }
+      `;
+
+      // Bind popup and click event
+      marker.bindPopup(popupContent);
+      marker.on('click', () => {
+        onStationClick?.(station);
+      });
+    });
+
+    // Cleanup function
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, [stations, onStationClick]);
 
   return (
     <Card className="bg-gradient-to-br from-card to-accent/5 border-accent/20">
       <div className="p-6">
-        <div ref={mapContainer} className="h-64 rounded-lg" />
+        <div 
+          ref={mapContainer} 
+          className="h-64 w-full rounded-lg"
+        />
       </div>
     </Card>
   );

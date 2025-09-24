@@ -62,7 +62,7 @@ export const StationCard = ({ id, name, status, progress, timeRemaining }: Stati
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-muted-foreground">Charging Progress</span>
-                <span className="text-sm font-medium">{progress}%</span>
+                <span className="text-sm font-medium">{progress.toFixed(2)}%</span>
               </div>
               <Progress value={progress} className="h-2" />
             </div>
